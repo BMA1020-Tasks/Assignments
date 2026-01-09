@@ -25,7 +25,7 @@ As new assignments are made available or corrections are made, this repository w
 
 *Web interface*:
 
-Follow the instructions from [Download](#download).
+You need to re-download the repository or copy its content to your local repository. To re-download the repository, follow the instructions from [Download](#download).
 
 *Git*:
 
