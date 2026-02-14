@@ -14,6 +14,8 @@ The task description is explained in [particles.py](./particles.py). The simulat
 
 ![Particles recording](./videos/particles.mp4)
 
+(Note: in this video, the particles are spawned at a faster rate than the task description.)
+
 ## Submission
 As part of the submission, please upload the following files:
 - [particles.py](./particles.py)
