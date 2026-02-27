@@ -13,9 +13,9 @@
  * @details It has been adjusted to suit the needs for this project.
  */
 
-layout(location = 1) in vec3 nearPoint;
-layout(location = 2) in vec3 farPoint;
-layout(location = 0) out vec4 outColor;
+in vec3 nearPoint;
+in vec3 farPoint;
+out vec4 outColor;
 
 in mat4 fragView;
 in mat4 fragProj;

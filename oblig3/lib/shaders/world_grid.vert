@@ -13,7 +13,7 @@
  * @details It has been adjusted to suit the needs for this project.
  */
 
-layout(location = 0) in vec3 position;
+in vec3 position;
 
 out vec3 nearPoint;
 out vec3 farPoint;

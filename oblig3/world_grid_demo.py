@@ -2,6 +2,7 @@ import numpy as np
 import pyglet
 from pyglet.window import key
 import lib
+from pyglet.gl import *
 
 # Window properties
 # -----------------
@@ -9,6 +10,9 @@ window = pyglet.window.Window()
 window.width = 1280
 window.height = 720
 
+# Shaders
+# -----------------
+shader = lib.create3DShader()
 
 # Objects
 # -------
@@ -21,8 +25,18 @@ world_grid = lib.shapes.WorldGrid(batch)
 # ------
 # We introduce the camera as a concept. It is our eyes into the 3d world.
 camera = lib.Camera(width=window.width, height=window.height,
-                    fov=60,
+                    fov=60,  # Measured in degrees
                     near=0.01, far=1000.0)
+
+# Objects
+# -------
+size = 3
+prism = lib.shapes.Prism3D(x=0, y=-size/2, z=0,
+                           width=size, height=size, depth=size,
+                           color=(190, 30, 160, 255),
+                           # You can add the prism to batch, also
+                           # batch=batch,
+                           program=shader)
 
 # Camera position with spherical coordinates
 camera.distance = 10
@@ -57,11 +71,19 @@ def on_draw():
     window.clear()
 
     # Camera matrices
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     world_grid.shader["u_projection"] = camera.get_projection()
     world_grid.shader["u_view"] = camera.get_look_at()
-
     batch.draw()
 
+    # # Choose between wireframe or solid mode
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+
+    shader["u_projection"] = camera.get_projection()
+    shader["u_view"] = camera.get_look_at()
+
+    prism.draw()
 
 @window.event
 def on_mouse_scroll(x, y, scroll_x, scroll_y):

@@ -11,9 +11,9 @@ uniform WindowBlock
     mat4 view;
 } window;
 
-uniform mat4 model;
-uniform mat4 u_projection;
-uniform mat4 u_view;
+uniform mat4 model = mat4(1.0);
+uniform mat4 u_projection = mat4(1.0);
+uniform mat4 u_view = mat4(1.0);
 
 void main()
 {
