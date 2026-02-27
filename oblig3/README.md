@@ -53,13 +53,18 @@ Task 4: In [lib/Camera.py](./lib/Camera.py), complete method `get_projection()`.
 
 Task 5: In [lib/Camera.py](./lib/Camera.py), complete method `get_look_at()`. This returns a matrix that describes the camera's orientation, position and the up vector.
 
+### Optional Tasks
+World grids can be useful while working with 3D graphics to help navigating the world. It is optional to use the world grid and the template that the [world grid demo](./world_grid_demo.py) provides.
+
+To make the demo work, you need to complete the following tasks:
+- *Task 4*
+- *Task 5*
+- *Task 6*: In [lib/transformations.py](./lib/transformations.py), complete the `perspective(...)` method
+- *Task 7*: In [lib/transformations.py](./lib/transformations.py), complete the `look_at(...)` method
+
 
 ## Demo - Particle systems (Part 1)
-The task description is explained in [particles.py](./particles.py). The simulation may look as follow:
-
-![Particles recording](./videos/particles.mp4)
+TBA
 
 ## Submission
-As part of the submission, please upload the following files:
-- [particles.py](./particles.py)
-- [geometric.py](./geometric.py)
+TBA
