@@ -65,7 +65,9 @@ To make the demo work, you need to complete the following tasks:
 
 
 ## Demo - Particle systems (Part 1)
-TBA
+<video width="320" height="240" controls>
+  <source src="./videos/particles.mp4" type="video/mp4">
+</video>
 
 ## Submission
 TBA
