@@ -1,6 +1,6 @@
 # Assignment 3
 
-This assignment is a continuation of *assignment 3*, and we will take the simulations a step further into 3-dimensional space. Whilst the task descriptions are similar to the previous assignment, there are some minor changes. Please read them carefully to not miss important details.
+This assignment is a continuation of *assignment 3*, and we will take the simulations a step further into 3-dimensional space. Whilst the task descriptions are similar to the previous assignment, there are some changes. Please read them carefully to not miss important details.
 
 - [Part 1: Particle Systems](#part-1-particle-systems)
 - Part 2: TBA
@@ -82,6 +82,8 @@ def on_draw():
 
 Note: We need only to do this with our own custom shapes. If you work with Pyglet's 2D shapes, this is not necessary.
 
+See [world_grid_demo.py](./world_grid_demo.py) for a full demonstration.
+
 #### Feature 2: Camera
 In the real life, we see the world through our eyes. To capture what we see, we can use cameras. Similarly, we can see virtual 2D and 3D worlds through the camera. For instance, while you are watching films, you watch the scenes captured by a camera.
 
@@ -103,6 +105,17 @@ projection = camera.get_projection()
 view = camera.get_look_at()
 ```
 
+The camera is programmed to orbit around the origin. You can do this by setting the following values:
+```py
+# Describes the camera's distance from origin.
+camera.distance = 10
+
+# Describes the camera's spherical coordinates (polar and azimuthal angles)
+# in radians.
+camera.phi = np.pi/6
+camera.theta = np.pi / 4
+```
+
 Arguments:
 | Name | Type | Description |
 |---|---|---|
@@ -112,6 +125,7 @@ Arguments:
 | `near` | `float` | Near clip plane. Used to compute the viewing frustum. Anything between the near clip plane and the camera is *not* visible. Too small value or `0.0` cause undefined behaviours. |
 | `far` | `float` | Far clip plane. Used to compute the viewing frustum and represents the farthest distance from a camera that a visible object can be. Useful to obscure non-important objects in the distance. |
 
+See [world_grid_demo.py](./world_grid_demo.py) for a full demonstration.
 
 
 #### Feature 3: Prism3D Shape
@@ -156,6 +170,9 @@ Arguments:
 | batch | `pyglet.graphics.Batch` | [Optional] Include the shape in a batch. It will then be draw together with any other shapes in the batch. |
 | program | `pyglet.graphics.Shader` | [Mandatory] Pass a reference to our custom shader. |
 
+See [world_grid_demo.py](./world_grid_demo.py) for a full demonstration.
+
+
 #### Feature 4: WorldGrid Shape
 The `WorldGrid` shape inherits from a custom `Rectangle3D` shape. It creates an infinite world grid that helps navigating the 3D world. Internally, it creates its own special shader, so including the WorldGrid is simple.
 
@@ -182,6 +199,9 @@ def on_draw():
     # OR
     # batch.draw()
 ```
+
+See [world_grid_demo.py](./world_grid_demo.py) for a full demonstration.
+
 
 ## Demo - Particle systems (Part 1)
 <video width="320" height="240" controls>
