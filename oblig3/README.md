@@ -198,6 +198,95 @@ def on_draw():
 
 See [world_grid_demo.py](./world_grid_demo.py) for a full demonstration.
 
+#### Feature 5: Widgets
+Pyglet does not provide widgets out-of-the-box. Although it supports labels, we must manually create our own widgets using primitive shapes like rectangles. Whilst widgets are not mandatory for the course, they can be useful to quickly testing or changing parameters, observing changes in real-time and debugging.
+
+> On Friday the 13th of March, there is a demo in-class about using widgets.
+
+You can create a label using Pyglet's built-in features:
+```python
+import pyglet
+
+font_size = 18
+font_type = 'Times New Roman'
+
+# You can add labels to batches.
+label = pyglet.text.Label("My label",
+                          font_name=font_type,
+                          font_size=font_size,
+                          x=30.0,
+                          y=600,
+                          anchor_x='left', anchor_y='center')
+```
+
+We have created a slider, provided in *lib*.
+```py
+# The slider also supports batches.
+slider = lib.widgets.Slider(
+    x=150,
+    y=660.0,
+    width=300.0,
+    height=20.0,
+    knob_width=60,
+    knob_height=40,
+    color=(249, 166, 253, 255),
+    knob_color=(90, 90, 90, 255),
+    starting_value=0.0
+)
+```
+
+| Name | Type | Description |
+|--|--|--|
+|x|`float`|x-position on the screen|
+|y|`float`|y-position on the screen|
+|width|`float`|Length of the track|
+|height|`float`|Height of the track|
+|knob_width|`float`|Length of the knob|
+|knob_height|`float`|Height of the knob|
+|color|`tuple`|Color of the track|
+|knob_color|`tuple`|Color of the knob|
+|starting_value|`float`|The slider's value range between $0.0$ and $1.0$. The starting value dictates the initial value.|
+
+> NB! To use the slider, you must implement the linear interpolation function of `lerp()` in [lib/linalg.py](./lib/linalg.py).
+
+To change the value of the slide with the mouse, you must update it using an event, e.g. a mouse drag event.
+
+```py
+@window.event
+def on_mouse_drag(x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
+    if buttons & pyglet.window.mouse.LEFT:
+        slider.update_clicked(x, y)
+        print(slider.value)
+```
+
+With the widgets, you can create a useful and powerful user interface. For example, to display the slider's value, you can display it with a label.
+
+```py
+label = pyglet.text.Label("Slider value: 0.0",
+                          font_name=font_type,
+                          font_size=font_size,
+                          x=30.0,
+                          y=600,
+                          anchor_x='left', anchor_y='center')
+
+slider = lib.widgets.Slider(x=150,
+                            y=660.0,
+                            width=300.0,
+                            height=20.0,
+                            knob_width=60,
+                            knob_height=40,
+                            color=(249, 166, 253, 255),
+                            knob_color=(90, 90, 90, 255),
+                            starting_value=0.0)
+
+@window.event
+def on_mouse_drag(x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
+    if buttons & pyglet.window.mouse.LEFT:
+        slider.update_clicked(x, y)
+        label.text = str(slider.value)
+```
+
+You can also move objects in 3d space with the slider, change the particle spawn rate, and more.
 
 ## Demo - Particle systems (Part 1)
 <video width="320" height="240" controls>
