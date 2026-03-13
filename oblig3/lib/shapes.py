@@ -399,8 +399,7 @@ class Prism3D(pyglet.shapes.ShapeBase):
 
     def _update_translation(self) -> None:
         """Overwrite this method to support 3d position"""
-        self._vertex_list.translation[:] = (
-            self._x, self._y, self._z) * self._num_verts
+        self._vertex_list.translation[:] = (self._x, self._y, self._z) * self._num_verts
 
     @property
     def z(self) -> float:
@@ -410,3 +409,129 @@ class Prism3D(pyglet.shapes.ShapeBase):
     def z(self, value: float) -> None:
         self._z = value
         self._update_translation()
+
+
+class Circle3D(pyglet.shapes.ShapeBase):
+
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        z: float,
+        radius: float,
+        segments: int | None = None,
+        color: tuple[int, int, int, int] | tuple[int, int, int] = (255, 255, 255, 255),
+        blend_src: int = GL_SRC_ALPHA,
+        blend_dest: int = GL_ONE_MINUS_SRC_ALPHA,
+        batch: Batch | None = None,
+        group: Group | None = None,
+        program: ShaderProgram | None = None,
+    ) -> None:
+        """Create a circle.
+
+        The circle's anchor point (x, y) defaults to the center of the circle.
+
+        Args:
+            x:
+                X coordinate of the circle.
+            y:
+                Y coordinate of the circle.
+            z:
+                Z coordinate of the circle.
+            radius:
+                The desired radius.
+            segments:
+                You can optionally specify how many distinct triangles
+                the circle should be made from. If not specified it will
+                be automatically calculated using the formula:
+                `max(14, int(radius / 1.25))`.
+            color:
+                The RGB or RGBA color of the circle, specified as a
+                tuple of 3 or 4 ints in the range of 0-255. RGB colors
+                will be treated as having an opacity of 255.
+            blend_src:
+                OpenGL blend source mode; for example, ``GL_SRC_ALPHA``.
+            blend_dest:
+                OpenGL blend destination mode; for example, ``GL_ONE_MINUS_SRC_ALPHA``.
+            batch:
+                Optional batch to add the shape to.
+            group:
+                Optional parent group of the shape.
+            program:
+                Optional shader program of the shape.
+        """
+        self._x = x
+        self._y = y
+        self._z = z
+        self._radius = radius
+        self._segments = segments or max(14, int(radius / 1.25))
+        r, g, b, *a = color
+        self._rgba = r, g, b, a[0] if a else 255
+
+        super().__init__(
+            self._segments * 3,
+            blend_src,
+            blend_dest,
+            batch,
+            group,
+            program,
+        )
+
+    def _create_vertex_list(self) -> None:
+        self._vertex_list = self._program.vertex_list(
+            self._segments * 3,
+            self._draw_mode,
+            self._batch,
+            self._group,
+            position=("f", self._get_vertices()),
+            colors=("Bn", self._rgba * self._num_verts),
+            translation=("f", (self._x, self._y, self._z) * self._num_verts),
+        )
+
+    def _get_vertices(self) -> Sequence[float]:
+        if not self._visible:
+            return (0, 0, 0) * self._num_verts
+
+        x = -self._anchor_x
+        y = -self._anchor_y
+        r = self._radius
+        tau_segs = math.pi * 2 / self._segments
+
+        # 3D points on the circle in local XY plane (z=0)
+        points = [
+            (x + r * math.cos(i * tau_segs), y + r * math.sin(i * tau_segs), 0.0)
+            for i in range(self._segments)
+        ]
+
+        vertices = []
+        for i, point in enumerate(points):
+            # Center vertex + two edge vertices, all with z=0
+            triangle = (x, y, 0.0, *points[i - 1], *point)
+            vertices.extend(triangle)
+
+        return vertices
+
+    def _update_vertices(self) -> None:
+        self._vertex_list.position[:] = self._get_vertices()
+
+    def _update_translation(self) -> None:
+        self._vertex_list.translation[:] = (self._x, self._y, self._z) * self._num_verts
+
+    @property
+    def radius(self) -> float:
+        """Gets/set radius of the circle."""
+        return self._radius
+
+    @property
+    def z(self) -> float:
+        return self._z
+
+    @z.setter
+    def z(self, value: float) -> None:
+        self._z = value
+        self._update_translation()
+
+    @radius.setter
+    def radius(self, value: float) -> None:
+        self._radius = value
+        self._update_vertices()
