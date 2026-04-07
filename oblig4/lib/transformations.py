@@ -1,6 +1,4 @@
 import numpy as np
-import pyglet
-from pyglet.math import Mat4
 
 def translate(x, y, z):
     """Return a 4x4 translation matrix."""

@@ -1,17 +1,6 @@
 # Assignment 4
 
-In the fourth assignment, we will achieve the following (in 3D):
-
-*Part A*:
-- Create a particle system with collisions.
-
-*Part B*:
-- To be announced
-
-<!-- Create a spaceship.
-- Introduce lighting to lit the spaceship's interior. -->
-
-
+In the fourth assignment, extend *assignment 3* to create a scene where we look at colliding particles from a spaceship bridge.
 
 ## Deadline
 Please visit [Moodle](https://capquiz.math.ntnu.no/) to see the deadline.
@@ -19,21 +8,20 @@ Please visit [Moodle](https://capquiz.math.ntnu.no/) to see the deadline.
 ## Table of Content
 - [Task 1: Initialising the program](#1-initialising-the-program)
 - [Task 2: Re-introducing the particle system](#2-re-introducing-the-particle-system)
+- [Task 3: Lighting and Reflection](#3-lighting-and-reflection)
+- [Task 4: Global State](#4-global-state)
+- [Task 5: Spaceship](#5-spaceship)
 - [Additional Library](#additional-library)
 
 ## 1. Initialising the Program
 a) In [space_simulation.py](./space_simulation.py), create a default Pyglet application. The window size should be 1280x720
 - If you use MacOS and have a Retina screen, setting this may lead to unexpected results. In this case, do not set the window size. The operating system will do this for you.
 
-
 b) Enable occlusion culling with `glEnable(GL_DEPTH_TEST)`. This ensures that objects blocked by other objects closer to the camera do not render.
 
-```py
-from pyglet.gl import glEnable, GL_DEPTH_TEST
+c) Create a GlobalState. This is a new feature that helps us configure all the parameters that our shader needs. Once this is configured, you no longer need to worry about it. You can read more in [Feature 9: Global State](#feature-9-global-state). We will get back to the global state later.
 
-# On initialising the program
-glEnable(GL_DEPTH_TEST)
-```
+You can find the template in [space_simulation.py](./space_simulation.py)
 
 ## 2. Re-introducing the Particle System
 In assignment 3, we introduced and created a particle system in 3D. We will do it a little differently this time, according to the following specifications:
@@ -62,10 +50,96 @@ $$\vec{F} = \frac{G m_1 m_2 (\vec{x}_1 - \vec{x}_2)}{| (\vec{x}_1 - \vec{x}_2)|^
 
 Choose a gravitational constant $G$ that is much higher than the real one, so the forces are not negligible. Alternatively work with masses of astronomical size!
 
+## 3. Lighting and reflection
+To create an immersive scene, we introduce lighting to our scene. In essence, lighting is introduced by applying reflection models to the scene's surfaces. While we will not implement a reflection model ourselves in *assignment 4*, this task will build a fundamental understanding of the Phong model. This will be useful to understand both how the library has implemented it and to prepare for *assignment 5*.
+
+### How we see the world around us
+In essence, we see our surroundings when light reflects from surfaces and interacts with our photoreceptors.
+
+<div style="width:30%; margin: auto auto; display: block;">
+    <img src="./images/light_reflection_illustration.png" alt="Illustration of light reflection">
+    <p>Figure 1: A illustration of light reflection. Source: <a href="https://www.tuttee.co/blog/biol-how-we-can-see-with-our-eyes">tuttee.co</a></p>
+</div>
+
+There are many factors that determine how a surface appears to us, including our unique anatomy and colour dificiencies, but for the purpose of our assignment we are mostly concerned with light frequencies are reflected or absorbed, and texture.
+
+### The Phong reflection model
+A reflection model describes the reflected radiance toward the observer. The Phong model is one of such model and consists of the following componnts:
+- $k_a$: the ambient constant that affects all objects in the scene.
+- $k_d$: the diffuse constant is unique per object. Often used to set the objects' colour.
+- $k_s$: the specular constant. Describes where the reflection highlights are and their colour.
+
+
+<div style="width:50%; margin:auto; display:block;">
+    <img src="./images/phong-model.png" alt="Illustration of light reflection">
+    <p>Figure 2: The Phong model components. Source: <a href="https://en.wikipedia.org/wiki/Phong_reflection_model">Wikipedia</a></p>
+</div>
+
+
+By adding the three components together, we get the irradiance of a point on the surface.
+
+### Code
+Implementation of the Phong model is found in the [shader](./lib/shaders/default_shader.frag). While we have the surface's position (the flower in *Figure 1*), we must provide the camera and light positions.
+
+1. Create a point light in the scene. It can be represented by a sphere. Example:
+    ```py
+    point_light = lib.Sphere(x=0, y=0, z=0,
+                             radius=2,
+                             color=(255, 0, 0, 255),
+                             batch=batch)
+    ```
+2. Have access to the camera's position. This can be done with e.g. the camera class.
+   ```py
+   camera = lib.Camera()
+   camera.get_position()
+   ```
+
+## 4. Global State
+For all objects in the scene, the camera and light positions are the same. The library introduces the helper class `GlobalState` that passes these values to the shader. In [Task 1: Initialising the program](#1-initialising-the-program), we created a global_state class and call its `update()` method in the draw function (`on_draw()`). We will update the code to use the correct light position.
+
+1. If you have not already done so, create an instance of `GlobalState`.
+    ```py
+    global_state = lib.GlobalState()
+    ```
+2. In `on_draw()`, update the global state before drawing anything.
+    ```py
+    window = pyglet.window.Window()
+
+    @window.event
+    def on_draw():
+        window.clear()
+        light_position = np.array([point_light.x, point_light.y, point_light.z])
+        global_state.update(camera.get_position(), light_position)
+
+        # The rest of the on_draw() function.
+    ```
+
+## 5. Spaceship
+In *Task 5*, we extend the scene, so we are sitting in a spaceship, looking at space particles ([*Task 2*](#2-re-introducing-the-particle-system)) colliding with each other. An example of the camera's perspective can be as follow:
+
+<div style="width:70%; margin:auto; display:block;">
+    <img src="./images/spaceship_camera.png" alt="Illustration of light reflection">
+    <p>Figure 3: The view from the spaceship's bridge.</p>
+</div>
+
+1. Create a custom model shape and load the spaceship:
+    ```py
+    # By default, the shape will load the spaceship automatically.
+    spaceship = lib.shapes.CustomModel(x=0, y=0, z=0,
+                                       scale=1.0,
+                                       batch=batch)
+    ```
+2. Place the camera inside the ship, so it looks like we are sitting on the captain's chair and looking out of the window, as shown in *Figure 3*.
+3. Extend the scene, so we are rotating around the particle system. Demo: [spaceship_demo.mp4](./images/spaceship_demo.mp4). (In the demo, two spheres are placed at origin as a visual reference.)
+
+> If you want to provide your own model, you can overwrite the default spaceship. `CustomModel` has parameter `filepath` where you can pass your own model. It must be a Wavefront file, and all smoothing (`s 0` or `s 1`) should be removed to prevent error messages.
+
+
 ## Additional Library
 Equally to the last assignment, we introduce the additional library [`lib`](./lib/). New additions for this iteration include:
 - [`Sphere`](#feature-7-sphere)
 - [`CustomModel`](#feature-8-custom-model)
+- [`GlobalState`](#feature-9-global-state)
 
 Changes:
 - A shader must no longer be provided to create 3D shapes. This is now handled internally. Please see [Feature 1: Camera](#feature-1-camera) for more details.
@@ -406,9 +480,9 @@ import pyglet
 # Optional: You can add the prism to a batch
 batch = pyglet.graphics.Batch()
 
-spaceship_model = lib.shapes.CustomModel(filepath="data/spaceship.obj",
-                                         x=0.0, y=0.0, z=0.0,
-                                         size=1,
+spaceship_model = lib.shapes.CustomModel(x=0.0, y=0.0, z=0.0,
+                                         scale=1,
+                                         filepath="data/spaceship.obj",
                                          batch=batch)
 ```
 
@@ -418,6 +492,33 @@ Arguments:
 | x | `float` | x-position in 3D space. |
 | y | `float` | y-position in 3D space. |
 | z | `float` | z-position in 3D space. |
-| size | `float` | Specify the size of the model. The model's vertex positions are scaled accordingly. |
-| color | `tuple` | Specifies the sphere's color. |
+| scale | `float` | Specify the size of the model. The model's vertex positions are scaled accordingly. |
+| color | `tuple` | Define the model's base colour. This is the diffuse colour in the Phong reflection model. |
+| filepath | `str` | By default, a spaceship is loaded. Overwrite this parameter to load a custom model. |
 | batch | `pyglet.graphics.Batch` | [Optional] Include the shape in a batch. It will then be draw together with any other shapes in the batch. |
+
+#### Feature 9: Global State
+The `GlobalState` is a helper class to store key variables required for reflection and lighting modelling. It is similar to how we set projection and view matrices.
+
+Its API is designed to be set and forget. The GlobalState updates the following variables:
+- The camera position.
+- The light source's position.
+
+Example:
+```py
+import lib
+
+# Create a global state instance on initialising the program
+global_state = lib.GlobalState()
+
+# Variables to upload with example values
+camera_position = np.array([10.0, 3.0, 0.0])
+light_position = np.array([0.0, 5.0, 0.0])
+
+# When drawing, update the state's values.
+@window.event
+def on_draw():
+    global_state.update(camera_position, light_position)
+```
+
+See the provided template in [space_simulation.py](./space_simulation.py) to find an example program using the global state.
