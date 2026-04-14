@@ -500,6 +500,10 @@ Arguments:
 The `CustomModel` supports rotation via a rotation matrix. Example:
 ```py
 import numpy
+import pyglet
+
+window = pyglet.window.Window()
+
 
 spaceship_model = lib.shapes.CustomModel(x=0.0, y=0.0, z=0.0,
                                          scale=1,
@@ -507,6 +511,12 @@ spaceship_model = lib.shapes.CustomModel(x=0.0, y=0.0, z=0.0,
                                          batch=batch)
 
 spaceship_model.rotation_matrix = np.identity(4)
+
+@window.event
+def on_draw():
+    # Upload the matrix
+    spaceship_model.upload_rotation_matrix()
+
 ```
 
 #### Feature 9: Global State
