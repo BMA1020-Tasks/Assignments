@@ -497,6 +497,18 @@ Arguments:
 | filepath | `str` | By default, a spaceship is loaded. Overwrite this parameter to load a custom model. |
 | batch | `pyglet.graphics.Batch` | [Optional] Include the shape in a batch. It will then be draw together with any other shapes in the batch. |
 
+The `CustomModel` supports rotation via a rotation matrix. Example:
+```py
+import numpy
+
+spaceship_model = lib.shapes.CustomModel(x=0.0, y=0.0, z=0.0,
+                                         scale=1,
+                                         filepath="data/spaceship.obj",
+                                         batch=batch)
+
+spaceship_model.rotation_matrix = np.identity(4)
+```
+
 #### Feature 9: Global State
 The `GlobalState` is a helper class to store key variables required for reflection and lighting modelling. It is similar to how we set projection and view matrices.
 
