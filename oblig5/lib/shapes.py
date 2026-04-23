@@ -633,8 +633,6 @@ class Line3D(pyglet.shapes.ShapeBase):
         r, g, b, *a = color
         self._rgba = r, g, b, a[0] if a else 255
 
-        if program is None:
-            program = shader
         super().__init__(24,
                          GL_SRC_ALPHA,
                          GL_ONE_MINUS_SRC_ALPHA,
