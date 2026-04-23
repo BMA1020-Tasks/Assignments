@@ -133,6 +133,8 @@ b) Create the vertices and indices:
 ```py
 vertices, indices = icosphere(subdivision_frequency)
 indices = indices.flatten().tolist()
+vertices = vertices.flatten().tolist()
+count = vertices.shape[0]
 ```
 
 c) Instantiate the planet
@@ -157,11 +159,11 @@ planet = lib.shapes.Planet(
 )
 ```
 
-The number of vertices are defined as follow:
+<!-- The number of vertices are defined as follow:
 
 $$c = 10 * \lambda^2 + 2$$
 
-where $c$ is the number of vertices, and $\lambda$ is the subdivision frequency.
+where $c$ is the number of vertices, and $\lambda$ is the subdivision frequency. -->
 
 By default, the planet is completely white. That means if everything was configured correctly, you should see a white planet in front of the camera.
 
